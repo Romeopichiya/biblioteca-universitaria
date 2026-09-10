@@ -3,6 +3,8 @@ package edu.apkinal.bibliotecauniversitaria.controller;
 import edu.apkinal.bibliotecauniversitaria.model.Libro;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+
 public class BibliotecaViewController implements Initializable {
 
     @FXML private TextField txtIsbn;
@@ -22,6 +25,7 @@ public class BibliotecaViewController implements Initializable {
     @FXML private TextField txtEditorial;
     @FXML private TextField txtAnio;
     @FXML private TextField txtStock;
+    @FXML private TextField txtBuscar;
 
     @FXML private TableView<Libro> tblLibros;
     @FXML private TableColumn<Libro, String> colIsbn;
@@ -38,8 +42,32 @@ public class BibliotecaViewController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         libroController = new LibroController();
         configurarColumnas();
-        cargarDatosTabla();
-        
+        List<Libro> librosDB = libroController.listarLibros();
+        listaLibrosData = FXCollections.observableArrayList(librosDB);
+
+        FilteredList<Libro> datosFiltrados = new FilteredList<>(listaLibrosData, b -> true);
+
+        txtBuscar.textProperty().addListener((observable, oldValue, newValue) -> {
+            datosFiltrados.setPredicate(libro -> {
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                if (libro.getTitulo().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else if (libro.getAutor().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else if (libro.getIsbn().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                return false;
+            });
+        });
+
+        SortedList<Libro> datosOrdenados = new SortedList<>(datosFiltrados);
+        datosOrdenados.comparatorProperty().bind(tblLibros.comparatorProperty());
+        tblLibros.setItems(datosOrdenados);
         tblLibros.getSelectionModel().selectedItemProperty().addListener(
             (observable, oldValue, newValue) -> seleccionarLibro(newValue)
         );
@@ -56,8 +84,9 @@ public class BibliotecaViewController implements Initializable {
 
     private void cargarDatosTabla() {
         List<Libro> librosDB = libroController.listarLibros();
-        listaLibrosData = FXCollections.observableArrayList(librosDB);
-        tblLibros.setItems(listaLibrosData);
+        if (listaLibrosData != null) {
+            listaLibrosData.setAll(librosDB);
+        }
     }
 
     private void seleccionarLibro(Libro libro) {

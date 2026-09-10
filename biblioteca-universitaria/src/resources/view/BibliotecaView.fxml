@@ -69,7 +69,13 @@
             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
          </padding>
          <children>
-            <TableView fx:id="tblLibros" prefHeight="450.0" prefWidth="490.0" VBox.vgrow="ALWAYS">
+             <!-- Barra de Búsqueda -->
+            <TextField fx:id="txtBuscar" promptText="Buscar por título, autor o ISBN..." style="-fx-prompt-text-fill: #7f8c8d;">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </TextField>
+            <TableView fx:id="tblLibros" prefHeight="420.0" prefWidth="490.0" VBox.vgrow="ALWAYS">
               <columns>
                 <TableColumn fx:id="colIsbn" prefWidth="85.0" text="ISBN" />
                 <TableColumn fx:id="colTitulo" prefWidth="120.0" text="Título" />
