@@ -13,10 +13,10 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/resources/view/BibliotecaView.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/resources/view/LoginView.fxml"));
             Scene scene = new Scene(root);
             
-            primaryStage.setTitle("Sistema de Biblioteca Universitaria");
+            primaryStage.setTitle("Acceso - Sistema de Biblioteca Universitaria");
             primaryStage.setScene(scene);
             primaryStage.setResizable(false);
             primaryStage.show();
