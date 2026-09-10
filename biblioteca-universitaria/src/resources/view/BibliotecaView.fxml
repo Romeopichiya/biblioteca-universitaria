@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.apkinal.bibliotecauniversitaria.controller.BibliotecaViewController">
+   <top>
+      <VBox alignment="CENTER" prefHeight="60.0" prefWidth="800.0" style="-background-color: #2c3e50;" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="Gestión de Biblioteca Universitaria" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+   </top>
+   <left>
+      <VBox prefWidth="280.0" spacing="10.0" style="-background-color: #ecf0f1;" BorderPane.alignment="CENTER">
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+         <children>
+            <Label text="Datos del Libro" textFill="#2c3e50">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <TextField fx:id="txtIsbn" promptText="ISBN" />
+            <TextField fx:id="txtTitulo" promptText="Título" />
+            <TextField fx:id="txtAutor" promptText="Autor" />
+            <TextField fx:id="txtEditorial" promptText="Editorial" />
+            <TextField fx:id="txtAnio" promptText="Año de Publicación" />
+            <TextField fx:id="txtStock" promptText="Stock (Copias)" />
+            <HBox alignment="CENTER" spacing="10.0">
+               <children>
+                  <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#handleGuardarLibro" style="-background-color: #27ae60; -fx-text-fill: white;" text="Guardar" />
+                  <Button fx:id="btnLimpiar" mnemonicParsing="false" onAction="#handleLimpiarCampos" style="-background-color: #e74c3c; -fx-text-fill: white;" text="Limpiar" />
+               </children>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </left>
+   <center>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+         <children>
+            <TableView fx:id="tblLibros" prefHeight="450.0" prefWidth="490.0" VBox.vgrow="ALWAYS">
+              <columns>
+                <TableColumn fx:id="colIsbn" prefWidth="85.0" text="ISBN" />
+                <TableColumn fx:id="colTitulo" prefWidth="120.0" text="Título" />
+                <TableColumn fx:id="colAutor" prefWidth="100.0" text="Autor" />
+                <TableColumn fx:id="colEditorial" prefWidth="90.0" text="Editorial" />
+                <TableColumn fx:id="colAnio" prefWidth="50.0" text="Año" />
+                <TableColumn fx:id="colStock" prefWidth="45.0" text="Stock" />
+              </columns>
+            </TableView>
+         </children>
+      </VBox>
+   </center>
+</BorderPane>
+
+
