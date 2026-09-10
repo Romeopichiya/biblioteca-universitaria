@@ -11,6 +11,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class BibliotecaViewController implements Initializable {
@@ -38,6 +39,10 @@ public class BibliotecaViewController implements Initializable {
         libroController = new LibroController();
         configurarColumnas();
         cargarDatosTabla();
+        
+        tblLibros.getSelectionModel().selectedItemProperty().addListener(
+            (observable, oldValue, newValue) -> seleccionarLibro(newValue)
+        );
     }
 
     private void configurarColumnas() {
@@ -55,18 +60,22 @@ public class BibliotecaViewController implements Initializable {
         tblLibros.setItems(listaLibrosData);
     }
 
+    private void seleccionarLibro(Libro libro) {
+        if (libro != null) {
+            txtIsbn.setText(libro.getIsbn());
+            txtIsbn.setDisable(true);
+            txtTitulo.setText(libro.getTitulo());
+            txtAutor.setText(libro.getAutor());
+            txtEditorial.setText(libro.getEditorial());
+            txtAnio.setText(String.valueOf(libro.getAnioPublicacion()));
+            txtStock.setText(String.valueOf(libro.getStock()));
+        }
+    }
+
     @FXML
     private void handleGuardarLibro(ActionEvent event) {
         try {
-            String isbn = txtIsbn.getText();
-            String titulo = txtTitulo.getText();
-            String autor = txtAutor.getText();
-            String editorial = txtEditorial.getText();
-            int anio = Integer.parseInt(txtAnio.getText());
-            int stock = Integer.parseInt(txtStock.getText());
-
-            Libro nuevoLibro = new Libro(isbn, titulo, autor, editorial, anio, stock);
-            
+            Libro nuevoLibro = capturarDatosFormulario();
             boolean guardado = libroController.agregarLibro(nuevoLibro);
             
             if (guardado) {
@@ -74,24 +83,87 @@ public class BibliotecaViewController implements Initializable {
                 cargarDatosTabla();
                 handleLimpiarCampos(null);
             } else {
-                mostrarAlerta("Error", "No se pudo guardar el libro. Verifique los datos o si el ISBN ya existe.", Alert.AlertType.ERROR);
+                mostrarAlerta("Error", "No se pudo guardar el libro (Revise si el ISBN ya existe).", Alert.AlertType.ERROR);
             }
-
         } catch (NumberFormatException e) {
-            mostrarAlerta("Formato Incorrecto", "El año y el stock deben ser valores numéricos enteros.", Alert.AlertType.WARNING);
+            mostrarAlerta("Formato Incorrecto", "El año y el stock deben ser numéricos.", Alert.AlertType.WARNING);
         } catch (IllegalArgumentException e) {
             mostrarAlerta("Validación", e.getMessage(), Alert.AlertType.WARNING);
         }
     }
 
     @FXML
+    private void handleEditarLibro(ActionEvent event) {
+        if (txtIsbn.getText().isEmpty()) {
+            mostrarAlerta("Aviso", "Seleccione un libro de la tabla para editar.", Alert.AlertType.WARNING);
+            return;
+        }
+
+        try {
+            Libro libroActualizado = capturarDatosFormulario();
+            boolean actualizado = libroController.actualizarLibro(libroActualizado);
+            
+            if (actualizado) {
+                mostrarAlerta("Éxito", "Libro actualizado correctamente.", Alert.AlertType.INFORMATION);
+                cargarDatosTabla();
+                handleLimpiarCampos(null);
+            } else {
+                mostrarAlerta("Error", "No se pudo actualizar el libro.", Alert.AlertType.ERROR);
+            }
+        } catch (NumberFormatException e) {
+            mostrarAlerta("Formato Incorrecto", "El año y el stock deben ser numéricos.", Alert.AlertType.WARNING);
+        } catch (IllegalArgumentException e) {
+            mostrarAlerta("Validación", e.getMessage(), Alert.AlertType.WARNING);
+        }
+    }
+
+    @FXML
+    private void handleEliminarLibro(ActionEvent event) {
+        String isbn = txtIsbn.getText();
+        if (isbn.isEmpty()) {
+            mostrarAlerta("Aviso", "Seleccione un libro de la tabla para eliminar.", Alert.AlertType.WARNING);
+            return;
+        }
+
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Confirmar eliminación");
+        confirmacion.setHeaderText("¿Está seguro de eliminar este libro?");
+        confirmacion.setContentText("Esta acción no se puede deshacer.");
+
+        Optional<ButtonType> resultado = confirmacion.showAndWait();
+        if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+            boolean eliminado = libroController.eliminarLibro(isbn);
+            if (eliminado) {
+                mostrarAlerta("Éxito", "Libro eliminado correctamente.", Alert.AlertType.INFORMATION);
+                cargarDatosTabla();
+                handleLimpiarCampos(null);
+            } else {
+                mostrarAlerta("Error", "No se pudo eliminar el libro.", Alert.AlertType.ERROR);
+            }
+        }
+    }
+
+    @FXML
     private void handleLimpiarCampos(ActionEvent event) {
         txtIsbn.clear();
+        txtIsbn.setDisable(false);
         txtTitulo.clear();
         txtAutor.clear();
         txtEditorial.clear();
         txtAnio.clear();
         txtStock.clear();
+        tblLibros.getSelectionModel().clearSelection();
+    }
+
+    private Libro capturarDatosFormulario() {
+        return new Libro(
+            txtIsbn.getText(),
+            txtTitulo.getText(),
+            txtAutor.getText(),
+            txtEditorial.getText(),
+            Integer.parseInt(txtAnio.getText()),
+            Integer.parseInt(txtStock.getText())
+        );
     }
 
     private void mostrarAlerta(String titulo, String mensaje, Alert.AlertType tipo) {

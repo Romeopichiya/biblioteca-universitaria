@@ -60,5 +60,46 @@ public class LibroController {
         
         return listaLibros;
     }
+    
+    // Actualizar los datos de un libro existente
+    public boolean actualizarLibro(Libro libro) {
+        String sql = "UPDATE Libros SET titulo = ?, autor = ?, editorial = ?, anioPublicacion = ?, stock = ? WHERE isbn = ?";
+        
+        try (Connection conn = Conexion.getInstancia().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, libro.getTitulo());
+            pstmt.setString(2, libro.getAutor());
+            pstmt.setString(3, libro.getEditorial());
+            pstmt.setInt(4, libro.getAnioPublicacion());
+            pstmt.setInt(5, libro.getStock());
+            pstmt.setString(6, libro.getIsbn());
+            
+            int filasAfectadas = pstmt.executeUpdate();
+            return filasAfectadas > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error al actualizar el libro: " + e.getMessage());
+            return false;
+        }
+    }
+
+    //Eliminar un libro de la base de datos
+    public boolean eliminarLibro(String isbn) {
+        String sql = "DELETE FROM Libros WHERE isbn = ?";
+        
+        try (Connection conn = Conexion.getInstancia().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, isbn);
+            
+            int filasAfectadas = pstmt.executeUpdate();
+            return filasAfectadas > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error al eliminar el libro: " + e.getMessage());
+            return false;
+        }
+    }
 }
 
